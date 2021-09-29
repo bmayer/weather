@@ -10,7 +10,7 @@ import requests
 
 RABBIT_HOST  = os.environ['RABBIT_HOST']
 RABBIT_QUEUE = os.environ['RABBIT_QUEUE']
-VAULT_ADDR = 'http://10.0.0.236:8200'
+# VAULT_ADDR = 'http://10.0.0.236:8200'
 # VAULT_ADDR = 'http://vault-full.vault-full.svc.cluster.local:8200'
 # VAULT_AUTH = 'kubernetes'
 # VAULT_MOUNT = "%s/" % (VAULT_AUTH)
