@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rmq-env-vars
+  namespace: weather
+data:
+  RABBIT_HOST: rabbit-rabbitmq-0.rabbit-rabbitmq-headless.rabbit.svc.cluster.local
+  RABBIT_QUEUE: weather

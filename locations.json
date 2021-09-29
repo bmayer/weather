@@ -1,0 +1,27 @@
+[
+  {
+    "city": "Narberth",
+    "zip": "19072",
+    "tz": "America/New_York"
+  },
+  {
+    "city": "Tripp",
+    "zip": "57376",
+    "tz": "America/Chicago"
+  },
+  {
+    "city": "Spokane",
+    "zip": "99201",
+    "tz": "America/Denver"
+  },
+  {
+    "city": "Sea_Ranch",
+    "zip": "95497",
+    "tz": "America/Los_Angeles"
+  },
+  {
+    "city": "Auburn",
+    "zip": "95603",
+    "tz": "America/Los_Angeles"
+  }
+]

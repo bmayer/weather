@@ -1,0 +1,73 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: rmq-pub
+  namespace: weather
+  labels:
+    app: rmq-pub
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: vault-k8s-auth
+          restartPolicy: OnFailure
+          containers:
+          - name: rmq-pub
+            image: python:alpine
+            imagePullPolicy: IfNotPresent
+            command: ["sh"]
+            args: 
+              - "-c"
+              - 'pip3 install requests hvac pika pytz requests --index-url=https://www.piwheels.org/simple; python3 /weather/rmq-pub.py'
+            env:
+              - name: RABBIT_HOST
+                valueFrom:
+                  configMapKeyRef:
+                    name: rmq-env-vars
+                    key: RABBIT_HOST
+              - name: RABBIT_QUEUE
+                valueFrom:
+                  configMapKeyRef:
+                    name: rmq-env-vars
+                    key: RABBIT_QUEUE
+              - name: WEATHER_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: weather-env-vars
+                    key: WEATHER_TOKEN
+              - name: WEATHER_URL
+                valueFrom:
+                  secretKeyRef: 
+                    name: weather-env-vars
+                    key: WEATHER_URL
+            resources:
+              limits:
+                cpu: "100m"
+                memory: "128Mi"
+              requests:
+                cpu: "50m"
+                memory: "64Mi"
+            volumeMounts:
+              - name: locations-json
+                mountPath: /weather/locations.json
+                subPath: locations.json
+              - name: rmq-pub-py
+                mountPath: /weather/rmq-pub.py
+                subPath: rmq-pub.py
+              
+          volumes:
+            - name: locations-json
+              configMap:
+                name: locations-json
+                items:
+                  - key: locations.json
+                    path: locations.json
+            - name: rmq-pub-py
+              configMap:
+                name: rmq-pub-py
+                items:
+                  - key: rmq-pub.py
+                    path: rmq-pub.py

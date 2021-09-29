@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rmq-consume
+  namespace: weather
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: rmq-consume
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: rmq-consume
+    spec:
+      containers:
+      - args:
+        - -c
+        - 'pip3 install influxdb pika --index-url=https://www.piwheels.org/simple; python3 /weather/rmq-consume.py'
+        command:
+        - sh
+        image: python:alpine
+        imagePullPolicy: IfNotPresent
+        name: rmq-consume
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        env:
+          - name: INFLUXDB_DB
+            valueFrom:
+              configMapKeyRef:
+                name: influxdb-env-vars
+                key: INFLUXDB_DB
+          - name: INFLUXDB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: influxdb-env-vars
+                key: INFLUXDB_HOST
+          - name: INFLUXDB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: influxdb-env-vars
+                key: INFLUXDB_PORT
+          - name: INFLUXDB_RP
+            valueFrom:
+              configMapKeyRef:
+                name: influxdb-env-vars
+                key: INFLUXDB_RP
+          - name: RABBIT_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: rmq-env-vars
+                key: RABBIT_HOST
+          - name: RABBIT_QUEUE
+            valueFrom:
+              configMapKeyRef:
+                name: rmq-env-vars
+                key: RABBIT_QUEUE
+        volumeMounts:
+          - name: rmq-consume-py
+            mountPath: /weather/rmq-consume.py
+            subPath: rmq-consume.py
+          
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: vault-k8s-auth
+      serviceAccountName: vault-k8s-auth
+      terminationGracePeriodSeconds: 30
+      
+      volumes:
+      - name: rmq-consume-py
+        configMap:
+          name: rmq-consume-py
+          items:
+            - key: rmq-consume.py
+              path: rmq-consume.py
