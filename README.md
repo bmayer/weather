@@ -38,3 +38,8 @@ kubectl create secret generic weather-env-vars --from-file=weather-secret.yml -n
 kubectl apply -f rmq-pub-cron.yml
 
 ```
+
+## Updating Locations
+```shell=
+kubectl create cm locations-json --from-file=locations.json -nweather -oyaml --dry-run=client | kubectl replace -f -
+```

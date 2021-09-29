@@ -23,5 +23,10 @@
     "city": "Auburn",
     "zip": "95603",
     "tz": "America/Los_Angeles"
+  },
+  {
+    "city": "Sacramento",
+    "zip": "95814",
+    "tz": "America/Los_Angeles"
   }
 ]
